@@ -1,33 +1,3 @@
-/*
- * Copyright (c) 2006, Swedish Institute of Computer Science.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the Institute nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- */
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -50,22 +20,17 @@ import se.sics.cooja.Simulation;
 import se.sics.cooja.TimeEvent;
 import se.sics.cooja.VisPlugin;
 /**
- * This is a simple example COOJA plugin.
- * It is a simulation plugin (SIM_PLUGIN): it depends on a single simulation.
- * 
- * This plugin demonstrates user interaction, scheduling time events, 
- * and saving plugin configurations.
  * 
  * This project must be loaded in COOJA before the plugin can be used:
  * Menu>Settings>Manage project directories>Browse>..>OK
  * 
- * @author Fredrik Osterlind
+ * @author Fergus Leahy
  */
-@ClassDescription("Fergus' Plugin") /* Description shown in menu */
+@ClassDescription("Cooja HWDB") /* Description shown in menu */
 @PluginType(PluginType.SIM_PLUGIN)
-public class MyDummyPlugin extends VisPlugin {
+public class CoojaHWDB extends VisPlugin {
   private static final long serialVersionUID = 4368807123350830772L;
-  private static Logger logger = Logger.getLogger(MyDummyPlugin.class);
+  private static Logger logger = Logger.getLogger(CoojaHWDB.class);
 
 
   private Simulation sim;
@@ -77,8 +42,8 @@ public class MyDummyPlugin extends VisPlugin {
    * @param simulation Simulation object
    * @param gui GUI object 
    */
-  public MyDummyPlugin(Simulation simulation, GUI gui) {
-    super("Fergus' Plugin", gui);
+  public CoojaHWDB(Simulation simulation, GUI gui) {
+    super("Cooja HWDB", gui);
     this.sim = simulation;
 
     /* Button */
