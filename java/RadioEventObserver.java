@@ -25,6 +25,7 @@ public class RadioEventObserver extends InterfaceEventObserver {
     logger.info("'" + GUI.getDescriptionOf(moteInterface.getClass())
         + "'" + " of mote '" + (moteID > 0 ? Integer.toString(moteID) : "?")
         + "'");
-    logger.info(moteID + ", " + "Radio, " + mote.getInterfaces().getRadio().getLastEvent());
+    logger.info(moteID + ", " + "Radio, " + mote.getInterfaces().getRadio().getLastEvent() + 
+    						", " + mote.getSimulation().getSimulationTime());
   }
 }
