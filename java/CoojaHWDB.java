@@ -50,7 +50,7 @@ public class CoojaHWDB extends VisPlugin {
   private ArrayList<Observer> radioObservers;
   private Observer msObserver;
   private MoteCountListener moteCountListener;
-
+  private ArrayList<MoteObserver> moteObservers;
   private JTextField textField;
 
 
@@ -63,10 +63,11 @@ public class CoojaHWDB extends VisPlugin {
     sim = simulation;
     radioMedium = sim.getRadioMedium();
     //radioObservers = new ArrayList<Observer>();
-
+    moteObservers = new ArrayList<MoteObserver>();
 
     for(Mote mote : sim.getMotes()) {
-      mote.getInterfaces().getRadio().addObserver(radioObserver);
+      moteObservers.add(new MoteObserver(this, mote));
+      //mote.getInterfaces().getRadio().addObserver(radioObserver);
     }
 
     /* Button */
@@ -91,17 +92,17 @@ public class CoojaHWDB extends VisPlugin {
     };
 
     /* Subscribes to all events on the radio medium */
-    radioMedium.addRadioMediumObserver(radioMediumObserver = new Observer() {
-      public void update(Observable obs, Object obj) {
-        RadioConnection conn = radioMedium.getLastConnection();
-        if (conn == null) return;
-        String s = "Mote: " + conn.getSource().getMote().getID() + "sent to Mote(s): ";
-        for(Radio radio : conn.getDestinations()) {
-          s += radio.getMote().getID() + " ";
-        }
-        logger.info(s);
-      }
-    });
+    // radioMedium.addRadioMediumObserver(radioMediumObserver = new Observer() {
+    //   public void update(Observable obs, Object obj) {
+    //     RadioConnection conn = radioMedium.getLastConnection();
+    //     if (conn == null) return;
+    //     String s = "Mote: " + conn.getSource().getMote().getID() + "sent to Mote(s): ";
+    //     for(Radio radio : conn.getDestinations()) {
+    //       s += radio.getMote().getID() + " ";
+    //     }
+    //     logger.info(s);
+    //   }
+    // });
 
     /* Listens for any new nodes added during runtime */
     sim.getEventCentral().addMoteCountListener(moteCountListener = new MoteCountListener() {
@@ -153,6 +154,9 @@ public class CoojaHWDB extends VisPlugin {
     for(Mote mote : sim.getMotes()) {
       mote.getInterfaces().getRadio().deleteObserver(radioObserver);
     }
+    for(MoteObserver mote : moteObservers) {
+      mote.deleteAllObservers();
+    }
     logger.info("CoojaHWDB cleaned up");
   }
 
@@ -173,7 +177,7 @@ public class CoojaHWDB extends VisPlugin {
       logger.info("No radio obj");
       return;
     }
-    logger.info("Last event from mote " + radio.getMote().getID() + ": " + radio.getLastEvent());
+    logger.info("Last event from mote " + radio.getMote().getID() + " : " + radio.getLastEvent());
 
     // lastEventLabel.setText("Last event: " + radio.getLastEvent());
     // ssLabel.setText("Signal strength (not auto-updated): "
