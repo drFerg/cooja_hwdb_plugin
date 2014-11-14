@@ -45,8 +45,8 @@ public class MoteObserver {
         intObserver.getInterfaceObservable().deleteObserver(intObserver);
       }
     }
-    public void radioEvent(Radio radio){
-      parent.radioEvent(radio);
+    public void radioEventHandler(Radio radio){
+      parent.radioEventHandler(radio);
     }
   }
 
