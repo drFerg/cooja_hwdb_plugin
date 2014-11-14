@@ -12,8 +12,8 @@ import se.sics.cooja.MoteInterface;
 @ClassDescription("Interface Event Observer")
 public class InterfaceEventObserver implements Observer {
     protected Mote mote = null;
-    private Observable interfaceObservable;
-    private MoteObserver parent;
+    protected MoteObserver parent;
+    protected Observable interfaceObservable;
     protected static Logger logger = Logger.getLogger(InterfaceEventObserver.class);
 
     public InterfaceEventObserver(MoteObserver parent, Mote mote,

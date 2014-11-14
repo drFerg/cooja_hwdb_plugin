@@ -7,6 +7,7 @@ import org.jdom.Element;
 import se.sics.cooja.ClassDescription;
 import se.sics.cooja.GUI;
 import se.sics.cooja.Mote;
+import se.sics.cooja.interfaces.Radio;
 import se.sics.cooja.MoteInterface;
 
 public class RadioEventObserver extends InterfaceEventObserver {
@@ -19,13 +20,14 @@ public class RadioEventObserver extends InterfaceEventObserver {
 
 	@Override
 	public void update(Observable obs, Object obj) {
-    final MoteInterface moteInterface = (MoteInterface) obs;
+    final Radio radio = (Radio) obs;
     int moteID = mote.getID();
 
-    logger.info("'" + GUI.getDescriptionOf(moteInterface.getClass())
+    logger.info("'" + GUI.getDescriptionOf(radio.getClass())
         + "'" + " of mote '" + (moteID > 0 ? Integer.toString(moteID) : "?")
         + "'");
-    logger.info(moteID + ", " + "Radio, " + mote.getInterfaces().getRadio().getLastEvent() + 
+    logger.info(moteID + ", " + "Radio, " + radio.getLastEvent() + 
     						", " + mote.getSimulation().getSimulationTime());
+    parent.radioEvent(radio);
   }
 }

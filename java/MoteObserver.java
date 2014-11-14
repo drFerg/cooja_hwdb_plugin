@@ -15,11 +15,11 @@ import se.sics.cooja.interfaces.Radio;
 @ClassDescription("Mote Observer")
 public class MoteObserver {
     protected Mote mote = null;
-    protected Object parent = null;
+    protected MoteEventObserver parent = null;
     protected ArrayList<InterfaceEventObserver> observers;
     private static Logger logger = Logger.getLogger(MoteObserver.class);
 
-    public MoteObserver(Object parent, Mote moteToObserve) {
+    public MoteObserver(MoteEventObserver parent, Mote moteToObserve) {
       this.parent = parent;
       this.mote = moteToObserve;
       observers = new ArrayList<InterfaceEventObserver>();
@@ -44,6 +44,9 @@ public class MoteObserver {
       for (InterfaceEventObserver intObserver : observers) {
         intObserver.getInterfaceObservable().deleteObserver(intObserver);
       }
+    }
+    public void radioEvent(Radio radio){
+      parent.radioEvent(radio);
     }
   }
 

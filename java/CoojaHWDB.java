@@ -38,7 +38,7 @@ import se.sics.cooja.interfaces.Radio;
  */
 @ClassDescription("Cooja HWDB") /* Description shown in menu */
 @PluginType(PluginType.SIM_PLUGIN)
-public class CoojaHWDB extends VisPlugin {
+public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
   private static final long serialVersionUID = 4368807123350830772L;
   private static Logger logger = Logger.getLogger(CoojaHWDB.class);
 
@@ -62,12 +62,10 @@ public class CoojaHWDB extends VisPlugin {
     super("Cooja HWDB", gui);
     sim = simulation;
     radioMedium = sim.getRadioMedium();
-    //radioObservers = new ArrayList<Observer>();
     moteObservers = new ArrayList<MoteObserver>();
 
     for(Mote mote : sim.getMotes()) {
       moteObservers.add(new MoteObserver(this, mote));
-      //mote.getInterfaces().getRadio().addObserver(radioObserver);
     }
 
     /* Button */
@@ -172,12 +170,12 @@ public class CoojaHWDB extends VisPlugin {
     return config;
   }
 
-  private void radioEvent(Radio radio) {
+  public void radioEvent(Radio radio) {
     if (radio == null) {
       logger.info("No radio obj");
       return;
     }
-    logger.info("Last event from mote " + radio.getMote().getID() + " : " + radio.getLastEvent());
+    logger.info(">>Last event from mote " + radio.getMote().getID() + " : " + radio.getLastEvent());
 
     // lastEventLabel.setText("Last event: " + radio.getLastEvent());
     // ssLabel.setText("Signal strength (not auto-updated): "
