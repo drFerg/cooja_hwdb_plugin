@@ -10,7 +10,6 @@ public class HWDBClient {
   private String myServiceName = "handler";
   private SRPC srpc;
   private Connection conn;
-  private int incomingPort = 0;
 
   public HWDBClient(String addr, int port, String serviceName) {
     try {
@@ -18,9 +17,8 @@ public class HWDBClient {
       myServiceName = serviceName;
       service = srpc.offer(myServiceName);
       conn = srpc.connect(addr, port, "HWDB");
-      incomingPort = srpc.details().getPort();
-      System.out.println(conn.call(String.format("SQL:create table radio (coojaTime integer, id integer, event varchar(40))")));
-      System.out.println(conn.call(String.format("SQL:select * from radio")));
+      System.out.println(conn.call("SQL:create table radio (time integer, id integer, event varchar(40), isRadioOn integer, signal real, power real)"));
+      System.out.println(conn.call("SQL:create persistenttable mote (id integer primary key, duty real, duration integer, radioOn integer, lastTime integer, lastStatus varchar(40), wasRadioOn integer)"));
     } 
     catch (Exception e) {
       System.out.println("HWDB connection failed");

@@ -40,14 +40,11 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
 
 
   private Simulation sim;
+  private HWDBClient hwdb;
   private RadioMedium radioMedium;
   private Observer radioMediumObserver;
-  private Observer radioObserver;
-  private ArrayList<Observer> radioObservers;
-  private Observer msObserver;
   private MoteCountListener moteCountListener;
   private ArrayList<MoteObserver> moteObservers;
-  private HWDBClient hwdb;
 
 
   /**
@@ -88,7 +85,7 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
   public void closePlugin() {
     /* Clean up plugin resources */
     logger.info("Tidying up CoojaHWDB listeners/observers");
-    sim.getEventCentral().removeMoteCountListener(moteCountListener);
+    sim.getEventCentral().removeMoteCountListener(moteCountListener); 
     //radioMedium.deleteRadioMediumObserver(radioMediumObserver);
     for(MoteObserver mote : moteObservers) {
       mote.deleteAllObservers();
@@ -97,12 +94,10 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
   }
 
   public void radioEventHandler(Radio radio) {
-    if (radio == null) {
-      logger.info("No radio obj");
-      return;
-    }
-    logger.info(">>Last event from mote " + radio.getMote().getID() + " : " + radio.getLastEvent());
-    hwdb.insert("radio", String.format("('%d', '%d',\"%s\")", sim.getSimulationTime(), radio.getMote().getID(), radio.getLastEvent()));
+    hwdb.insert("radio", String.format("('%d', '%d',\"%s\", '%d', '%1.1f', '%1.1f')", 
+      sim.getSimulationTime(), radio.getMote().getID(), 
+      radio.getLastEvent(), (radio.isRadioOn() ? 1 : 0), 
+      radio.getCurrentSignalStrength(), radio.getCurrentOutputPower()));
     // lastEventLabel.setText("Last event: " + radio.getLastEvent());
     // ssLabel.setText("Signal strength (not auto-updated): "
     //     + String.format("%1.1f", radio.getCurrentSignalStrength()) + " dBm");
