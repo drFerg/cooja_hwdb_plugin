@@ -1,6 +1,10 @@
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.SwingUtilities;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Observable;
@@ -45,6 +49,7 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
   private Observer radioMediumObserver;
   private MoteCountListener moteCountListener;
   private ArrayList<MoteObserver> moteObservers;
+  private boolean initialised = false;
 
 
   /**
@@ -55,29 +60,43 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
     super("Cooja HWDB", gui);
     sim = simulation;
     radioMedium = sim.getRadioMedium();
-    moteObservers = new ArrayList<MoteObserver>();
+    hwdb = new HWDBClient("localhost", 1234, "Cooja");
+    
+    /* Init Button */
+    JButton button = new JButton("Observe");
+    button.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        if (!initialised) initObservers();
+      }
+    });
+    add(BorderLayout.NORTH, button);
+    setSize(300,100);
+  }
 
+  public void initObservers() {
+    initialised = true;
+    /* Create observers for each mote */
+    moteObservers = new ArrayList<MoteObserver>();
     for(Mote mote : sim.getMotes()) {
-      moteObservers.add(new MoteObserver(this, mote));
+      addMote(mote);
     }
 
     /* Listens for any new nodes added during runtime */
     sim.getEventCentral().addMoteCountListener(moteCountListener = new MoteCountListener() {
       public void moteWasAdded(Mote mote) {
         /* Add mote's radio to observe list */
-        logger.info("Added a mote");
         addMote(mote);
+        logger.info("Added a mote");
       }
       public void moteWasRemoved(Mote mote) {
         /* Remove motes radio from observe list */
         logger.info("Removed a mote");
       }
     });
-
-    setSize(300,100);
-    hwdb = new HWDBClient("localhost", 1234, "Cooja");
   }
 
+  /* Adds a new mote to the observed set of motes 
+   * Needed for use in listener, to access /this/ context */
   public void addMote(Mote mote){
     moteObservers.add(new MoteObserver(this, mote));
   }
@@ -85,6 +104,7 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
   public void closePlugin() {
     /* Clean up plugin resources */
     logger.info("Tidying up CoojaHWDB listeners/observers");
+    if (!initialised) return;
     sim.getEventCentral().removeMoteCountListener(moteCountListener); 
     //radioMedium.deleteRadioMediumObserver(radioMediumObserver);
     for(MoteObserver mote : moteObservers) {
@@ -98,14 +118,6 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
       sim.getSimulationTime(), radio.getMote().getID(), 
       radio.getLastEvent(), (radio.isRadioOn() ? 1 : 0), 
       radio.getCurrentSignalStrength(), radio.getCurrentOutputPower()));
-    // lastEventLabel.setText("Last event: " + radio.getLastEvent());
-    // ssLabel.setText("Signal strength (not auto-updated): "
-    //     + String.format("%1.1f", radio.getCurrentSignalStrength()) + " dBm");
-    // if (radio.getChannel() == -1) {
-    //   channelLabel.setText("Current channel: ALL");
-    // } else {
-    //   channelLabel.setText("Current channel: " + radio.getChannel());
-    // }
   }
 
 }
