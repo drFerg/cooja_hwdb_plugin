@@ -9,7 +9,10 @@ import se.sics.cooja.GUI;
 import se.sics.cooja.Mote;
 import se.sics.cooja.interfaces.Radio;
 import se.sics.cooja.MoteInterface;
-
+/* Radio Event Observer
+ * 
+ * A specialised event observer for a mote's radio interface events 
+ */
 public class RadioEventObserver extends InterfaceEventObserver {
 
 	public RadioEventObserver(MoteObserver parent, Mote mote, 

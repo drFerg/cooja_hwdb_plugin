@@ -8,7 +8,10 @@ import se.sics.cooja.ClassDescription;
 import se.sics.cooja.GUI;
 import se.sics.cooja.Mote;
 import se.sics.cooja.MoteInterface;
-
+/* Interface Event Observer
+ *
+ * A generic event observer for a mote interface 
+ */
 @ClassDescription("Interface Event Observer")
 public class InterfaceEventObserver implements Observer {
     protected Mote mote = null;

@@ -11,7 +11,10 @@ import se.sics.cooja.Mote;
 import se.sics.cooja.MoteInterface;
 import se.sics.cooja.MoteInterfaceHandler;
 import se.sics.cooja.interfaces.Radio;
-
+/* MoteObserver 
+ * 
+ * Contains all the interface observers for each interface within a mote 
+ */
 @ClassDescription("Mote Observer")
 public class MoteObserver {
     protected Mote mote = null;

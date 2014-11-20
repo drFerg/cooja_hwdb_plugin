@@ -36,6 +36,13 @@ import se.sics.cooja.interfaces.Radio;
  * 
  * @author Fergus Leahy
  */
+
+/* 
+ * Cooja HWDB plugin
+ * 
+ * Pipes interface events (radio, CPU) from motes in Cooja into HWDB for analysis using automata.
+ * 
+ */
 @ClassDescription("Cooja HWDB") /* Description shown in menu */
 @PluginType(PluginType.SIM_PLUGIN)
 public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
@@ -62,7 +69,7 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
     radioMedium = sim.getRadioMedium();
     hwdb = new HWDBClient("localhost", 1234, "Cooja");
     
-    /* Init Button */
+    /* Initialise Observers button */
     JButton button = new JButton("Observe");
     button.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
