@@ -4,11 +4,11 @@ import java.util.Observer;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 
-import se.sics.cooja.ClassDescription;
-import se.sics.cooja.GUI;
-import se.sics.cooja.Mote;
-import se.sics.cooja.interfaces.Radio;
-import se.sics.cooja.MoteInterface;
+import org.contikios.cooja.ClassDescription;
+
+import org.contikios.cooja.Mote;
+import org.contikios.cooja.interfaces.Radio;
+import org.contikios.cooja.MoteInterface;
 /* Radio Event Observer
  * 
  * A specialised event observer for a mote's radio interface events 

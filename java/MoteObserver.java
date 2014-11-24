@@ -5,12 +5,14 @@ import java.util.Observer;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 
-import se.sics.cooja.ClassDescription;
-import se.sics.cooja.GUI;
-import se.sics.cooja.Mote;
-import se.sics.cooja.MoteInterface;
-import se.sics.cooja.MoteInterfaceHandler;
-import se.sics.cooja.interfaces.Radio;
+import org.contikios.cooja.ClassDescription;
+import org.contikios.cooja.Mote;
+import org.contikios.cooja.MoteInterface;
+import org.contikios.cooja.MoteInterfaceHandler;
+import org.contikios.cooja.interfaces.Radio;
+import org.contikios.cooja.mspmote.MspMote;
+import se.sics.mspsim.core.MSP430;
+
 /* MoteObserver 
  * 
  * Contains all the interface observers for each interface within a mote 
@@ -19,6 +21,7 @@ import se.sics.cooja.interfaces.Radio;
 public class MoteObserver {
     protected Mote mote = null;
     protected MoteEventObserver parent = null;
+    protected CPUEventObserver cpu;
     protected ArrayList<InterfaceEventObserver> observers;
     private static Logger logger = Logger.getLogger(MoteObserver.class);
 
@@ -27,10 +30,12 @@ public class MoteObserver {
       this.mote = moteToObserve;
       observers = new ArrayList<InterfaceEventObserver>();
       observeAll();
+      logger.info("HI: " + ((MspMote)mote).getCPU().getMode());
     }
 
     public void observeAll(){
       logger.info("Adding interfaces for mote: " + mote.getID());
+      cpu = new CPUEventObserver(this, mote);
       for (MoteInterface mi : mote.getInterfaces().getInterfaces()) {
         if (mi != null) {
           if (mi instanceof Radio)
@@ -47,9 +52,14 @@ public class MoteObserver {
       for (InterfaceEventObserver intObserver : observers) {
         intObserver.getInterfaceObservable().deleteObserver(intObserver);
       }
+      cpu.removeListener();
     }
     public void radioEventHandler(Radio radio){
       parent.radioEventHandler(radio);
+    }
+
+    public void cpuEventHandler(MSP430 cpu){
+      logger.info("CPU MODE: " + cpu.getMode());
     }
   }
 

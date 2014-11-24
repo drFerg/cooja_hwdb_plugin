@@ -4,10 +4,10 @@ import java.util.Observer;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 
-import se.sics.cooja.ClassDescription;
-import se.sics.cooja.GUI;
-import se.sics.cooja.Mote;
-import se.sics.cooja.MoteInterface;
+import org.contikios.cooja.ClassDescription;
+import org.contikios.cooja.Cooja;
+import org.contikios.cooja.Mote;
+import org.contikios.cooja.MoteInterface;
 /* Interface Event Observer
  *
  * A generic event observer for a mote interface 
@@ -35,7 +35,7 @@ public class InterfaceEventObserver implements Observer {
       final MoteInterface moteInterface = (MoteInterface) obs;
       int moteID = mote.getID();
 
-      logger.info("'" + GUI.getDescriptionOf(moteInterface.getClass())
+      logger.info("'" + Cooja.getDescriptionOf(moteInterface.getClass())
           + "'" + " of mote '" + (moteID > 0 ? Integer.toString(moteID) : "?")
           + "'");
     }

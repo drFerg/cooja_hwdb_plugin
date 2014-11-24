@@ -13,21 +13,24 @@ import java.util.Observer;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 
-import se.sics.cooja.ClassDescription;
-import se.sics.cooja.GUI;
-import se.sics.cooja.Mote;
-import se.sics.cooja.MoteInterface;
-import se.sics.cooja.MoteInterfaceHandler;
-import se.sics.cooja.PluginType;
-import se.sics.cooja.RadioConnection;
-import se.sics.cooja.RadioMedium;
-import se.sics.cooja.RadioPacket;
-import se.sics.cooja.SimEventCentral.MoteCountListener;
-import se.sics.cooja.Simulation;
-import se.sics.cooja.TimeEvent;
-import se.sics.cooja.VisPlugin;
+import org.contikios.cooja.ClassDescription;
+import org.contikios.cooja.Cooja;
+import se.sics.mspsim.core.MSP430;
+import org.contikios.cooja.Mote;
+import org.contikios.cooja.MoteInterface;
+import org.contikios.cooja.MoteInterfaceHandler;
+import org.contikios.cooja.PluginType;
+import org.contikios.cooja.RadioConnection;
+import org.contikios.cooja.RadioMedium;
+import org.contikios.cooja.RadioPacket;
+import org.contikios.cooja.SimEventCentral.MoteCountListener;
+import org.contikios.cooja.Simulation;
+import org.contikios.cooja.TimeEvent;
+import org.contikios.cooja.VisPlugin;
 
-import se.sics.cooja.interfaces.Radio;
+
+
+import org.contikios.cooja.interfaces.Radio;
 
 /**
  * 
@@ -57,16 +60,18 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
   private MoteCountListener moteCountListener;
   private ArrayList<MoteObserver> moteObservers;
   private boolean initialised = false;
+  private Cooja gui;
 
 
   /**
    * @param simulation Simulation object
    * @param gui GUI object 
    */
-  public CoojaHWDB(Simulation simulation, GUI gui) {
-    super("Cooja HWDB", gui);
+  public CoojaHWDB(Simulation simulation, Cooja gui) {
+    super("Cooja HWDB", gui, false);
     sim = simulation;
     radioMedium = sim.getRadioMedium();
+    this.gui = gui;
     hwdb = new HWDBClient("localhost", 1234, "Cooja");
     
     /* Initialise Observers button */
@@ -76,11 +81,17 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
         if (!initialised) initObservers();
       }
     });
-    add(BorderLayout.NORTH, button);
+    this.getContentPane().add(BorderLayout.NORTH, button);
     setSize(300,100);
   }
 
   public void initObservers() {
+    /* Check for class loaders, if not the same class casting won't work, reload to fix */
+    if ((sim.getMotes()[0].getClass().getClassLoader() != this.getClass().getClassLoader()) &&
+        (sim.getMotes()[0].getClass().getClassLoader() != gui.getClass().getClassLoader())) {
+          logger.info("Different class loaders");
+          return;
+    }
     initialised = true;
     /* Create observers for each mote */
     moteObservers = new ArrayList<MoteObserver>();
@@ -126,6 +137,9 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
       radio.getLastEvent(), (radio.isRadioOn() ? 1 : 0), 
       radio.getCurrentSignalStrength(), radio.getCurrentOutputPower()));
   }
+
+  public void cpuEventHandler(MSP430 cpu){}
+
 
 }
     /* Subscribes to all events on the radio medium */
