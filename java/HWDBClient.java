@@ -18,7 +18,10 @@ public class HWDBClient {
       service = srpc.offer(myServiceName);
       conn = srpc.connect(addr, port, "HWDB");
       System.out.println(conn.call("SQL:create table radio (time integer, id integer, event varchar(40), isRadioOn integer, signal real, power real)"));
+      System.out.println(conn.call("SQL:create table cpu (time integer, id integer, state integer, stateStr varchar(10))"));
       System.out.println(conn.call("SQL:create persistenttable mote (id integer primary key, duty real, duration integer, radioOn integer, lastTime integer, lastStatus varchar(40), wasRadioOn integer)"));
+      System.out.println(conn.call("SQL:create persistenttable cpuState (id integer primary key, duty real, duration integer, radioOn integer, lastTime integer, state integer)"));
+
     } 
     catch (Exception e) {
       System.out.println("HWDB connection failed");
@@ -26,11 +29,15 @@ public class HWDBClient {
   }
 
   public void insert(String table, String values) {
+    String result = "";
     try {
-      System.out.println(conn.call(String.format("SQL:insert into %s values %s", table, values)));
+      result = conn.call(String.format("SQL:insert into %s values %s", table, values));
     } 
     catch (Exception e) {
       System.out.println("SQL Insert failed");
+    }
+    if (!result.contains("Success")) {
+      System.out.println(String.format("Insert failed for table %s with %s", table, values));
     }
   }
 

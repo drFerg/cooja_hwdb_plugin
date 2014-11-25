@@ -22,11 +22,11 @@ public class CPUEventObserver implements OperatingModeListener{
     this.parent = parent;
     this.mote = (MspMote)mote;
     this.mote.getCPU().addOperatingModeListener(this);
-    parent.cpuEventHandler(this.mote.getCPU());
+    parent.cpuEventHandler(this.mote.getCPU(), mote);
   }
 
   public void modeChanged(Chip source, int mode) {
-    parent.cpuEventHandler(mote.getCPU());
+    parent.cpuEventHandler(mote.getCPU(), mote);
   }
 
   public void removeListener() {

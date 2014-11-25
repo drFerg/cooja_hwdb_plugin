@@ -16,6 +16,7 @@ import org.jdom.Element;
 import org.contikios.cooja.ClassDescription;
 import org.contikios.cooja.Cooja;
 import se.sics.mspsim.core.MSP430;
+import se.sics.mspsim.core.MSP430Constants;
 import org.contikios.cooja.Mote;
 import org.contikios.cooja.MoteInterface;
 import org.contikios.cooja.MoteInterfaceHandler;
@@ -27,9 +28,6 @@ import org.contikios.cooja.SimEventCentral.MoteCountListener;
 import org.contikios.cooja.Simulation;
 import org.contikios.cooja.TimeEvent;
 import org.contikios.cooja.VisPlugin;
-
-
-
 import org.contikios.cooja.interfaces.Radio;
 
 /**
@@ -131,14 +129,17 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
     logger.info("CoojaHWDB cleaned up");
   }
 
-  public void radioEventHandler(Radio radio) {
+  public void radioEventHandler(Radio radio, Mote mote) {
     hwdb.insert("radio", String.format("('%d', '%d',\"%s\", '%d', '%1.1f', '%1.1f')", 
-      sim.getSimulationTime(), radio.getMote().getID(), 
+      sim.getSimulationTime(), mote.getID(), 
       radio.getLastEvent(), (radio.isRadioOn() ? 1 : 0), 
       radio.getCurrentSignalStrength(), radio.getCurrentOutputPower()));
   }
 
-  public void cpuEventHandler(MSP430 cpu){}
+  public void cpuEventHandler(MSP430 cpu, Mote mote){
+     hwdb.insert("cpu", String.format("('%d', '%d', '%d', \"%s\")", sim.getSimulationTime(), mote.getID(),
+                 cpu.getMode(), MSP430Constants.MODE_NAMES[cpu.getMode()]));
+  }
 
 
 }

@@ -30,7 +30,6 @@ public class MoteObserver {
       this.mote = moteToObserve;
       observers = new ArrayList<InterfaceEventObserver>();
       observeAll();
-      logger.info("HI: " + ((MspMote)mote).getCPU().getMode());
     }
 
     public void observeAll(){
@@ -54,12 +53,12 @@ public class MoteObserver {
       }
       cpu.removeListener();
     }
-    public void radioEventHandler(Radio radio){
-      parent.radioEventHandler(radio);
+    public void radioEventHandler(Radio radio, Mote mote){
+      parent.radioEventHandler(radio, mote);
     }
 
-    public void cpuEventHandler(MSP430 cpu){
-      logger.info("CPU MODE: " + cpu.getMode());
+    public void cpuEventHandler(MSP430 cpu, Mote mote){
+      parent.cpuEventHandler(cpu, mote);
     }
   }
 

@@ -19,11 +19,11 @@ public class RadioEventObserver extends InterfaceEventObserver {
                             Observable interfaceToObserve){
 		super(parent, mote, interfaceToObserve);
 		logger.info("Created radio observer");
-    parent.radioEventHandler((Radio) interfaceToObserve);
+    parent.radioEventHandler((Radio) interfaceToObserve, mote);
 	}
 
   @Override
 	public void update(Observable radio, Object obj) {
-    parent.radioEventHandler((Radio) radio);
+    parent.radioEventHandler((Radio) radio, mote);
   }
 }
