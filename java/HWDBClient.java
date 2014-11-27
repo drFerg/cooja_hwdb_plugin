@@ -20,8 +20,8 @@ public class HWDBClient {
       System.out.println(conn.call("SQL:create table radio (time integer, id integer, event varchar(40), isRadioOn integer, signal real, power real)"));
       System.out.println(conn.call("SQL:create table cpu (time integer, id integer, state integer, stateStr varchar(10))"));
       System.out.println(conn.call("SQL:create persistenttable mote (id integer primary key, duty real, duration integer, radioOn integer, lastTime integer, lastStatus varchar(40), wasRadioOn integer)"));
-      System.out.println(conn.call("SQL:create persistenttable cpuState (id integer primary key, duty real, duration integer, radioOn integer, lastTime integer, state integer)"));
-
+      System.out.println(conn.call("SQL:create persistenttable cpuState (id integer primary key, duration integer, cpuOn integer, lastTime integer, state integer)"));
+      System.out.println(conn.call("SQL:create table cpuDuty (id integer, t integer, duty real)"));
     } 
     catch (Exception e) {
       System.out.println("HWDB connection failed");
