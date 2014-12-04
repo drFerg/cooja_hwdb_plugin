@@ -3,6 +3,7 @@ import java.lang.Runnable;
 import java.lang.String;
 import java.lang.Thread;
 import java.util.logging.Level;
+import java.util.ArrayList;
 import hwdb.*;
 import hwdb.Service;
 
@@ -37,6 +38,27 @@ public class HWDBClient {
     }
   }
 
+  public void bulk(final ArrayList<String> lines){
+    Thread t = new Thread(new Runnable() {
+      public void run() {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("BULK: ").append(lines.size()).append("\n");
+        for (String line: lines) {
+          buffer.append(line);
+        }
+        String result = "";
+        try {
+          result = conn.call(buffer.toString());
+        } 
+        catch (Exception e) {
+          System.out.println(e.getMessage() + result);
+
+        }
+      }
+    });
+    t.start();
+  }
+
   static Service service;
   public void run() {
     try {
@@ -51,7 +73,6 @@ public class HWDBClient {
   }
   public static void main(String[] args) {
     HWDBClient hwdb = new HWDBClient("localhost", 1234, "COOJA");
-    hwdb.insert("radio", "('394832904', '10', \"radio\")");
   }
 
 }

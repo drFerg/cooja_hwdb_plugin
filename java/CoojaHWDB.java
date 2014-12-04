@@ -60,6 +60,10 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
   private boolean initialised = false;
   private Cooja gui;
 
+  private ArrayList<String> insertBuffer;
+  private long lastTime;
+  private long delay = 100;
+  private int count = 0;
 
   /**
    * @param simulation Simulation object
@@ -71,6 +75,7 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
     radioMedium = sim.getRadioMedium();
     this.gui = gui;
     hwdb = new HWDBClient("localhost", 1234, "Cooja");
+
     
     /* Initialise Observers button */
     JButton button = new JButton("Observe");
@@ -81,6 +86,7 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
     });
     this.getContentPane().add(BorderLayout.NORTH, button);
     setSize(300,100);
+    insertBuffer = new ArrayList<String>();
   }
 
   public void initObservers() {
@@ -137,10 +143,20 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
   }
 
   public void cpuEventHandler(MSP430 cpu, Mote mote){
-     hwdb.insert("cpu", String.format("('%d', '%d', '%d', \"%s\")", sim.getSimulationTime(), mote.getID(),
+    addToInsertBuffer(String.format("insert into %s values ('%d', '%d', '%d', \"%s\")\n", "cpu", sim.getSimulationTime(), mote.getID(),
                  cpu.getMode(), MSP430Constants.MODE_NAMES[cpu.getMode()]));
+   // hwdb.insert("cpu", String.format("('%d', '%d', '%d', \"%s\")", sim.getSimulationTime(), mote.getID(),
+   //               cpu.getMode(), MSP430Constants.MODE_NAMES[cpu.getMode()]));
   }
 
+  private void addToInsertBuffer(String line) {
+    insertBuffer.add(line);
+    if (count++ > delay){
+      hwdb.bulk(new ArrayList<String>(insertBuffer));
+      insertBuffer.clear();
+      count = 0;
+    }
+  }
 
 }
     /* Subscribes to all events on the radio medium */
