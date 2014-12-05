@@ -136,26 +136,14 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
   }
 
   public void radioEventHandler(Radio radio, Mote mote) {
-    hwdb.insert("radio", String.format("('%d', '%d',\"%s\", '%d', '%1.1f', '%1.1f')", 
-      sim.getSimulationTime(), mote.getID(), 
-      radio.getLastEvent(), (radio.isRadioOn() ? 1 : 0), 
+    hwdb.insertLater(String.format("insert into %s values ('%d', '%d',\"%s\", '%d', '%1.1f', '%1.1f')\n",
+      "radio", sim.getSimulationTime(), mote.getID(), radio.getLastEvent(), (radio.isRadioOn() ? 1 : 0), 
       radio.getCurrentSignalStrength(), radio.getCurrentOutputPower()));
   }
 
   public void cpuEventHandler(MSP430 cpu, Mote mote){
-    addToInsertBuffer(String.format("insert into %s values ('%d', '%d', '%d', \"%s\")\n", "cpu", sim.getSimulationTime(), mote.getID(),
+    hwdb.insertLater(String.format("insert into %s values ('%d', '%d', '%d', \"%s\")\n", "cpu", sim.getSimulationTime(), mote.getID(),
                  cpu.getMode(), MSP430Constants.MODE_NAMES[cpu.getMode()]));
-   // hwdb.insert("cpu", String.format("('%d', '%d', '%d', \"%s\")", sim.getSimulationTime(), mote.getID(),
-   //               cpu.getMode(), MSP430Constants.MODE_NAMES[cpu.getMode()]));
-  }
-
-  private void addToInsertBuffer(String line) {
-    insertBuffer.add(line);
-    if (count++ > delay){
-      hwdb.bulk(new ArrayList<String>(insertBuffer));
-      insertBuffer.clear();
-      count = 0;
-    }
   }
 
 }

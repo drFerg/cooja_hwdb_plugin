@@ -34,23 +34,23 @@ public class MoteObserver {
 
     public void observeAll(){
       logger.info("Adding interfaces for mote: " + mote.getID());
-      cpu = new CPUEventObserver(this, mote);
-      // for (MoteInterface mi : mote.getInterfaces().getInterfaces()) {
-      //   if (mi != null) {
-      //     if (mi instanceof Radio)
-      //       observers.add(new RadioEventObserver(this, mote, mi));
-      //     // else
-      //     //   observers.add(new InterfaceEventObserver(this, mote, mi));
-      //   } 
-      //}
+      //cpu = new CPUEventObserver(this, mote);
+      for (MoteInterface mi : mote.getInterfaces().getInterfaces()) {
+        if (mi != null) {
+          if (mi instanceof Radio)
+            observers.add(new RadioEventObserver(this, mote, mi));
+          // else
+          //   observers.add(new InterfaceEventObserver(this, mote, mi));
+        } 
+      }
     }
 
     public void deleteAllObservers(){
       logger.info("Removing interfaces for mote: " + mote.getID());
-      // for (InterfaceEventObserver intObserver : observers) {
-      //   intObserver.getInterfaceObservable().deleteObserver(intObserver);
-      // }
-      cpu.removeListener();
+      for (InterfaceEventObserver intObserver : observers) {
+        intObserver.getInterfaceObservable().deleteObserver(intObserver);
+      }
+      //cpu.removeListener();
     }
     public void radioEventHandler(Radio radio, Mote mote){
       parent.radioEventHandler(radio, mote);
