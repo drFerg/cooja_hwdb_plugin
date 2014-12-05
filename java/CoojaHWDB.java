@@ -50,7 +50,6 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
   private static final long serialVersionUID = 4368807123350830772L;
   private static Logger logger = Logger.getLogger(CoojaHWDB.class);
 
-
   private Simulation sim;
   private HWDBClient hwdb;
   private RadioMedium radioMedium;

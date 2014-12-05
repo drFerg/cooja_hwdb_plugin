@@ -8,9 +8,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import hwdb.*;
 import hwdb.Service;
 
-static SEND_LIMIT = 700;
 
 public class HWDBClient implements Runnable {
+  static int SEND_LIMIT = 600;
   private Service service;
   private String myServiceName = "handler";
   private SRPC srpc;
@@ -77,6 +77,7 @@ public class HWDBClient implements Runnable {
       }
       try {
         result = conn.call(String.format("BULK: %d\n%s", count, query.toString()));
+        System.out.println(String.format("BULK: %d\n%s", count, query.toString()));
       } catch (Exception e) {
         System.out.println(String.format("Error: %s, %s", e.getMessage(), result));
       }
