@@ -15,8 +15,8 @@ public class HWDBClient implements Runnable {
   private String myServiceName = "handler";
   private SRPC srpc;
   private Connection conn;
-  private LinkedBlockingQueue<String> buffer;
-  private Thread t;
+  private LinkedBlockingQueue<String> insertBuffer;
+  private Thread insertThread;
 
   public HWDBClient(String addr, int port, String serviceName) {
     try {
@@ -25,13 +25,13 @@ public class HWDBClient implements Runnable {
       service = srpc.offer(myServiceName);
       conn = srpc.connect(addr, port, "HWDB");
       System.out.println("Connected to HWDB successfully");
-      t = new Thread(this);
-      t.start();
+      insertThread = new Thread(this);
+      insertThread.start();
     } 
     catch (Exception e) {
       System.out.println("HWDB connection failed");
     }
-    buffer = new LinkedBlockingQueue<String>();
+    insertBuffer = new LinkedBlockingQueue<String>();
   }
 
   public void insert(String table, String values) {
@@ -47,15 +47,20 @@ public class HWDBClient implements Runnable {
     }
   }
 
+  /* Inserts a full table insert line into buffer, to later be processed by insert thread */
   public void insertLater(String line) {
     try {
-      buffer.put(line); /* blocking put */
+      insertBuffer.put(line); /* blocking put, don't want to lose inserts */
     } catch (InterruptedException e) {
       System.out.println(e.getMessage());
     }
   }
 
-
+  /* Insert thread, generates BULK inserts into HWDB when entries are inserted into the insert buffer.
+   * 
+   * Waits for new inserts and sends all that are available in buffer up to SEND_LIMIT,
+   * but does not wait till fill up to that limit. 
+   */
   public void run() {
     int count;
     long start;
@@ -66,18 +71,18 @@ public class HWDBClient implements Runnable {
     while (true) { 
       query = new StringBuilder();
       try {
-        query.append(buffer.take());
+        query.append(insertBuffer.take()); /* Wait for at least one insert */
       } catch (InterruptedException e) {
         System.out.println(e.getMessage());
       }
       count = 1;
-      while (count < SEND_LIMIT && (line = buffer.poll()) != null) {
-        query.append(line);
+      /* take as many as we can that are available, but don't wait for more */
+      while (count < SEND_LIMIT && (line = insertBuffer.poll()) != null) {
+        query.append(line); 
         count++;
       }
       try {
         result = conn.call(String.format("BULK: %d\n%s", count, query.toString()));
-        System.out.println(String.format("BULK: %d\n%s", count, query.toString()));
       } catch (Exception e) {
         System.out.println(String.format("Error: %s, %s", e.getMessage(), result));
       }
