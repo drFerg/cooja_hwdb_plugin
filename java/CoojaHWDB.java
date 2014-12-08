@@ -148,14 +148,14 @@ public class CoojaHWDB extends VisPlugin implements CoojaEventObserver{
   }
 
   public void radioMediumEventHandler(RadioConnection conn) {
-    hwdb.insertLater(String.format("insert into connections values ('%d', '%d', '%d', '%d', '%d')", 
-                                    connections++, con.getSource().getMote().getID(), ));
-    for(Radio radio : conn.getDestinations()) {
-      s += radio.getMote().getID() + " ";
-    }
-    logger.info(s);
+    if (conn == null) return;
+    System.out.println("Got a conn");
+    hwdb.insertLater(String.format("insert into connections values ('%d', '%d', '%d', '%d', '%d', '%d')\n", 
+                                    connections++, conn.getStartTime(), conn.getSource().getMote().getID(),
+                                    conn.getDestinations().length, conn.getInterfered().length, 
+                                    conn.getSource().getLastPacketTransmitted().getPacketData().length));
   }
 
 }
-/* (id integer, src integer, rxd integer, crxd integer)
-/* (id integer, src integer, dst integer, )
+/* (id integer, startT long, src integer, rxd integer, crxd integer) */
+/* (id integer, src integer, dst integer, ) */
