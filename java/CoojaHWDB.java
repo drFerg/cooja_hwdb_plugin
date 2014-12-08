@@ -46,14 +46,14 @@ import org.contikios.cooja.interfaces.Radio;
  */
 @ClassDescription("Cooja HWDB") /* Description shown in menu */
 @PluginType(PluginType.SIM_PLUGIN)
-public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
+public class CoojaHWDB extends VisPlugin implements CoojaEventObserver{
   private static final long serialVersionUID = 4368807123350830772L;
   private static Logger logger = Logger.getLogger(CoojaHWDB.class);
 
   private Simulation sim;
   private HWDBClient hwdb;
   private RadioMedium radioMedium;
-  private Observer radioMediumObserver;
+  private RadioMediumEventObserver networkObserver;
   private MoteCountListener moteCountListener;
   private ArrayList<MoteObserver> moteObservers;
   private boolean initialised = false;
@@ -63,6 +63,7 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
   private long lastTime;
   private long delay = 100;
   private int count = 0;
+  private long connections = 0;
 
   /**
    * @param simulation Simulation object
@@ -96,6 +97,7 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
           return;
     }
     initialised = true;
+    networkObserver = new RadioMediumEventObserver(this, radioMedium);
     /* Create observers for each mote */
     moteObservers = new ArrayList<MoteObserver>();
     for(Mote mote : sim.getMotes()) {
@@ -126,8 +128,8 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
     /* Clean up plugin resources */
     logger.info("Tidying up CoojaHWDB listeners/observers");
     if (!initialised) return;
+    networkObserver.deleteObserver();
     sim.getEventCentral().removeMoteCountListener(moteCountListener); 
-    //radioMedium.deleteRadioMediumObserver(radioMediumObserver);
     for(MoteObserver mote : moteObservers) {
       mote.deleteAllObservers();
     }
@@ -135,26 +137,25 @@ public class CoojaHWDB extends VisPlugin implements MoteEventObserver{
   }
 
   public void radioEventHandler(Radio radio, Mote mote) {
-    hwdb.insertLater(String.format("insert into %s values ('%d', '%d',\"%s\", '%d', '%1.1f', '%1.1f')\n",
-      "radio", sim.getSimulationTime(), mote.getID(), radio.getLastEvent(), (radio.isRadioOn() ? 1 : 0), 
+    hwdb.insertLater(String.format("insert into radio values ('%d', '%d',\"%s\", '%d', '%1.1f', '%1.1f')\n",
+      sim.getSimulationTime(), mote.getID(), radio.getLastEvent(), (radio.isRadioOn() ? 1 : 0), 
       radio.getCurrentSignalStrength(), radio.getCurrentOutputPower()));
   }
 
   public void cpuEventHandler(MSP430 cpu, Mote mote){
-    hwdb.insertLater(String.format("insert into %s values ('%d', '%d', '%d', \"%s\")\n", "cpu", sim.getSimulationTime(), mote.getID(),
+    hwdb.insertLater(String.format("insert into cpu values ('%d', '%d', '%d', \"%s\")\n", sim.getSimulationTime(), mote.getID(),
                  cpu.getMode(), MSP430Constants.MODE_NAMES[cpu.getMode()]));
   }
 
+  public void radioMediumEventHandler(RadioConnection conn) {
+    hwdb.insertLater(String.format("insert into connections values ('%d', '%d', '%d', '%d', '%d')", 
+                                    connections++, con.getSource().getMote().getID(), ));
+    for(Radio radio : conn.getDestinations()) {
+      s += radio.getMote().getID() + " ";
+    }
+    logger.info(s);
+  }
+
 }
-    /* Subscribes to all events on the radio medium */
-    // radioMedium.addRadioMediumObserver(radioMediumObserver = new Observer() {
-    //   public void update(Observable obs, Object obj) {
-    //     RadioConnection conn = radioMedium.getLastConnection();
-    //     if (conn == null) return;
-    //     String s = "Mote: " + conn.getSource().getMote().getID() + "sent to Mote(s): ";
-    //     for(Radio radio : conn.getDestinations()) {
-    //       s += radio.getMote().getID() + " ";
-    //     }
-    //     logger.info(s);
-    //   }
-    // });
+/* (id integer, src integer, rxd integer, crxd integer)
+/* (id integer, src integer, dst integer, )

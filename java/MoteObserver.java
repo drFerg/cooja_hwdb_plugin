@@ -20,12 +20,12 @@ import se.sics.mspsim.core.MSP430;
 @ClassDescription("Mote Observer")
 public class MoteObserver {
     protected Mote mote = null;
-    protected MoteEventObserver parent = null;
+    protected CoojaEventObserver parent = null;
     protected CPUEventObserver cpu;
     protected ArrayList<InterfaceEventObserver> observers;
     private static Logger logger = Logger.getLogger(MoteObserver.class);
 
-    public MoteObserver(MoteEventObserver parent, Mote moteToObserve) {
+    public MoteObserver(CoojaEventObserver parent, Mote moteToObserve) {
       this.parent = parent;
       this.mote = moteToObserve;
       observers = new ArrayList<InterfaceEventObserver>();
