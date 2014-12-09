@@ -149,13 +149,24 @@ public class CoojaHWDB extends VisPlugin implements CoojaEventObserver{
 
   public void radioMediumEventHandler(RadioConnection conn) {
     if (conn == null) return;
-    System.out.println("Got a conn");
-    hwdb.insertLater(String.format("insert into connections values ('%d', '%d', '%d', '%d', '%d', '%d')\n", 
-                                    connections++, conn.getStartTime(), conn.getSource().getMote().getID(),
-                                    conn.getDestinations().length, conn.getInterfered().length, 
+    if (conn.getSource().getLastEvent() != Radio.RadioEvent.TRANSMISSION_FINISHED) return;
+    if (conn.getDestinations().length == 0) return;
+    hwdb.insertLater(String.format("insert into transmissions values ('%d', '%d', '%d', '%d', '%d', '%d', '%d')\n", 
+                                    connections, conn.getStartTime(), sim.getSimulationTime(), 
+                                    conn.getSource().getMote().getID(), conn.getDestinations().length, 
+                                    conn.getInterfered().length, 
                                     conn.getSource().getLastPacketTransmitted().getPacketData().length));
+    
+    for (Radio radio: conn.getAllDestinations()) {
+      hwdb.insertLater(String.format("insert into connections values ('%d', '%d', '%d', '%d', '%d', '%s', '%d')\n", 
+                                      connections, conn.getStartTime(), sim.getSimulationTime(), 
+                                      conn.getSource().getMote().getID(), radio.getMote().getID(),
+                                      (radio.isInterfered() ? "true" : "false"), 
+                                      conn.getSource().getLastPacketTransmitted().getPacketData().length));
+    }
+    connections++;
   }
 
 }
-/* (id integer, startT long, src integer, rxd integer, crxd integer) */
-/* (id integer, src integer, dst integer, ) */
+/* transmissions (id integer, startT integer, endT integer, src integer, rxd integer, crxd integer, pktSize integer)
+     connections (id integer, startT integer, endT integer, src integer, dst integer, interfered boolean, pktSize integer); */
