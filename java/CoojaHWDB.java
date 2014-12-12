@@ -137,6 +137,7 @@ public class CoojaHWDB extends VisPlugin implements CoojaEventObserver{
   }
 
   public void radioEventHandler(Radio radio, Mote mote) {
+    System.out.println(mote + " : "+ radio.getLastEvent());
     hwdb.insertLater(String.format("insert into radio values ('%d', '%d',\"%s\", '%d', '%1.1f', '%1.1f')\n",
       sim.getSimulationTime(), mote.getID(), radio.getLastEvent(), (radio.isRadioOn() ? 1 : 0), 
       radio.getCurrentSignalStrength(), radio.getCurrentOutputPower()));
@@ -149,17 +150,22 @@ public class CoojaHWDB extends VisPlugin implements CoojaEventObserver{
 
   public void radioMediumEventHandler(RadioConnection conn) {
     if (conn == null) return;
-    if (conn.getSource().getLastEvent() != Radio.RadioEvent.TRANSMISSION_FINISHED) return;
-    if (conn.getDestinations().length == 0) return;
-    hwdb.insertLater(String.format("insert into transmissions values ('%d', '%d', '%d', '%d', '%d', '%d', '%d')\n", 
-                                    connections, conn.getStartTime(), sim.getSimulationTime(), 
+    /* Retrieve connection data for transmission, including packet sequence number (made positive) */
+    /* 6198FCCD AB000300 04920003 00040048 656C6C6F  a..............HelloDD10 < Unicast to 3 from 4
+       4198F4CD ABFFFF00 06810006 0048656C 6C6F006E  A............Hello.nB0   < Broadcast from 6
+                  ^^^^^^ ^^< address(to|from) */
+
+    byte[] pkt = conn.getSource().getLastPacketTransmitted().getPacketData();
+    hwdb.insertLater(String.format("insert into transmissions values ('%d', '%d', '%d', '%d', '%d', '%d', '%d', '%s' )\n", 
+                                    pkt[2] & (0xff), /* Packet sequence number, made unsigned */
+                                    conn.getStartTime(), sim.getSimulationTime(), 
                                     conn.getSource().getMote().getID(), conn.getDestinations().length, 
-                                    conn.getInterfered().length, 
-                                    conn.getSource().getLastPacketTransmitted().getPacketData().length));
-    
+                                    conn.getInterfered().length, pkt.length,
+                                    pkt[0] == 0x02 ? "false" : (pkt[5] == -1 && pkt[6] == -1 ? "true":"false")));
+                                    /* Check if packet is reply (<5 bytes), then check if it's a broadcast packet */
     for (Radio radio: conn.getAllDestinations()) {
       hwdb.insertLater(String.format("insert into connections values ('%d', '%d', '%d', '%d', '%d', '%s', '%d')\n", 
-                                      connections, conn.getStartTime(), sim.getSimulationTime(), 
+                                      conn.getSource().getLastPacketTransmitted().getPacketData()[2] & (0xff), conn.getStartTime(), sim.getSimulationTime(), 
                                       conn.getSource().getMote().getID(), radio.getMote().getID(),
                                       (radio.isInterfered() ? "true" : "false"), 
                                       conn.getSource().getLastPacketTransmitted().getPacketData().length));
