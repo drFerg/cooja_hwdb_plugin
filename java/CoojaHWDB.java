@@ -64,7 +64,7 @@ public class CoojaHWDB extends VisPlugin implements CoojaEventObserver{
   private long delay = 100;
   private int count = 0;
   private long connections = 0;
-
+  private boolean mesh = true;
   /**
    * @param simulation Simulation object
    * @param gui GUI object 
@@ -137,7 +137,6 @@ public class CoojaHWDB extends VisPlugin implements CoojaEventObserver{
   }
 
   public void radioEventHandler(Radio radio, Mote mote) {
-    System.out.println(mote + " : "+ radio.getLastEvent());
     hwdb.insertLater(String.format("insert into radio values ('%d', '%d',\"%s\", '%d', '%1.1f', '%1.1f')\n",
       sim.getSimulationTime(), mote.getID(), radio.getLastEvent(), (radio.isRadioOn() ? 1 : 0), 
       radio.getCurrentSignalStrength(), radio.getCurrentOutputPower()));
@@ -163,12 +162,18 @@ public class CoojaHWDB extends VisPlugin implements CoojaEventObserver{
                                     conn.getInterfered().length, pkt.length,
                                     pkt[0] == 0x02 ? "false" : (pkt[5] == -1 && pkt[6] == -1 ? "true":"false")));
                                     /* Check if packet is reply (<5 bytes), then check if it's a broadcast packet */
-    for (Radio radio: conn.getAllDestinations()) {
+    for (Radio dst: conn.getAllDestinations()) {
       hwdb.insertLater(String.format("insert into connections values ('%d', '%d', '%d', '%d', '%d', '%s', '%d')\n", 
                                       conn.getSource().getLastPacketTransmitted().getPacketData()[2] & (0xff), conn.getStartTime(), sim.getSimulationTime(), 
-                                      conn.getSource().getMote().getID(), radio.getMote().getID(),
-                                      (radio.isInterfered() ? "true" : "false"), 
+                                      conn.getSource().getMote().getID(), dst.getMote().getID(),
+                                      (dst.isInterfered() ? "true" : "false"), 
                                       conn.getSource().getLastPacketTransmitted().getPacketData().length));
+      if (mesh && pkt[0] != 0x02 && (pkt[5] << 8 | pkt[6] &(0xff)) == dst.getMote().getID()) {
+        hwdb.insertLater(String.format("insert into meshRoutes values ('%d', '%d', '%d', '%d', '%d', '%d', '%d')\n", 
+                                      conn.getStartTime(), sim.getSimulationTime(), 
+                                      conn.getSource().getMote().getID(), dst.getMote().getID(),
+                                      (pkt[10] << 8 | pkt[11] &(0xff)), (pkt[12] << 8 | pkt[13] &(0xff)),
+                                      conn.getSource().getLastPacketTransmitted().getPacketData().length));}
     }
     connections++;
   }
