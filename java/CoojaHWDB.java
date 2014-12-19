@@ -169,7 +169,7 @@ public class CoojaHWDB extends VisPlugin implements CoojaEventObserver{
                                       (dst.isInterfered() ? "true" : "false"), 
                                       conn.getSource().getLastPacketTransmitted().getPacketData().length));
       if (mesh && pkt[0] != 0x02 && (pkt[5] << 8 | pkt[6] &(0xff)) == dst.getMote().getID()) {
-        hwdb.insertLater(String.format("insert into meshRoutes values ('%d', '%d', '%d', '%d', '%d', '%d', '%d')\n", 
+        hwdb.insertLater(String.format("insert into meshLinks values ('%d', '%d', '%d', '%d', '%d', '%d', '%d')\n", 
                                       conn.getStartTime(), sim.getSimulationTime(), 
                                       conn.getSource().getMote().getID(), dst.getMote().getID(),
                                       (pkt[10] << 8 | pkt[11] &(0xff)), (pkt[12] << 8 | pkt[13] &(0xff)),
